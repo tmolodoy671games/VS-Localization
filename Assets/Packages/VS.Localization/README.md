@@ -61,8 +61,9 @@ not implemented.
 `en` is the fallback when present; otherwise the first language is the fallback.
 Every entry needs that translation. Locale matching ignores case, accepts `_`, and
 tries regional parents (`ru-RU` → `ru`) before fallback. Missing translations use
-the fallback. `null`, empty and unknown locales also use fallback. `Locale` exposes
-the resolved code. Create a new instance to change locale.
+the fallback. `null`, empty and unknown locales also use fallback. The resolved
+locale stays private. Create a new instance to change locale. Generated translation
+properties and methods use switch expressions (C# 8 or newer).
 
 ## Install in Unity
 

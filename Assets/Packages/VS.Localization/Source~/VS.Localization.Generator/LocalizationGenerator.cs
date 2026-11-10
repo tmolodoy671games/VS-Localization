@@ -41,7 +41,7 @@ namespace VS.Localization.Generator
                     .AddVariables(VariableDeclarator("_locale")))
                     .AddModifiers(Token(SyntaxKind.PrivateKeyword), Token(SyntaxKind.ReadOnlyKeyword)),
                 PropertyDeclaration(CsType("string"), "Locale")
-                    .AddModifiers(Token(SyntaxKind.PublicKeyword))
+                    .AddModifiers(Token(SyntaxKind.PrivateKeyword))
                     .WithExpressionBody(ArrowExpressionClause(BinaryExpression(SyntaxKind.CoalesceExpression,
                         Id("_locale"), Literal(fallback))))
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
@@ -60,23 +60,26 @@ namespace VS.Localization.Generator
                     if (!new HashSet<string>(parameters).SetEquals(actual))
                         throw new FormatException($"{entry.Name}/{translation.Key}: placeholders must match the '{fallback}' translation.");
                 }
-                var sections = new List<SwitchSectionSyntax>();
+                var arms = new List<SwitchExpressionArmSyntax>();
                 foreach (var translation in entry.Translations)
                     if (translation.Key != fallback)
-                        sections.Add(SwitchSection().AddLabels(CaseSwitchLabel(Literal(translation.Key)))
-                            .AddStatements(ReturnStatement(Expression(translation.Value, new List<string>(), types, true))));
-                sections.Add(SwitchSection().AddLabels(DefaultSwitchLabel())
-                    .AddStatements(ReturnStatement(Expression(entry.Translations[fallback], new List<string>(), types, true))));
-                var body = Block(SwitchStatement(Member(ThisExpression(), "Locale")).AddSections(sections.ToArray()));
+                        arms.Add(SwitchExpressionArm(ConstantPattern(Literal(translation.Key)),
+                            Expression(translation.Value, new List<string>(), types, true)));
+                arms.Add(SwitchExpressionArm(DiscardPattern(),
+                    Expression(entry.Translations[fallback], new List<string>(), types, true)));
+                var body = ArrowExpressionClause(SwitchExpression(Member(ThisExpression(), "Locale"))
+                    .WithArms(SeparatedList(arms)));
                 if (parameters.Count == 0)
                     members.Add(PropertyDeclaration(CsType("string"), Escaped(entry.Name))
                         .AddModifiers(Token(SyntaxKind.PublicKeyword))
-                        .AddAccessorListAccessors(AccessorDeclaration(SyntaxKind.GetAccessorDeclaration).WithBody(body)));
+                        .WithExpressionBody(body)
+                        .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)));
                 else
                     members.Add(MethodDeclaration(CsType("string"), Escaped(entry.Name))
                         .AddModifiers(Token(SyntaxKind.PublicKeyword))
                         .AddParameterListParameters(parameters.Select(p => Parameter(Escaped(p)).WithType(CsType(types[p]))).ToArray())
-                        .WithBody(body));
+                        .WithExpressionBody(body)
+                        .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)));
             }
             var declaration = ClassDeclaration(Escaped(className))
                 .AddModifiers(Token(SyntaxKind.InternalKeyword)).AddMembers(members.ToArray());
@@ -91,15 +94,18 @@ namespace VS.Localization.Generator
                 ParenthesizedExpression(BinaryExpression(SyntaxKind.CoalesceExpression, Id("locale"), Literal(""))),
                 "Trim")), "Replace"), LiteralExpression(SyntaxKind.CharacterLiteralExpression, Microsoft.CodeAnalysis.CSharp.SyntaxFactory.Literal('_')),
                 LiteralExpression(SyntaxKind.CharacterLiteralExpression, Microsoft.CodeAnalysis.CSharp.SyntaxFactory.Literal('-'))), "ToLowerInvariant"));
-            var sections = locales.Select(locale => SwitchSection().AddLabels(CaseSwitchLabel(Literal(locale)))
-                .AddStatements(Assign(Id("_locale"), Id("candidate")), ReturnStatement())).ToArray();
+            var arms = locales.Select(locale => SwitchExpressionArm(ConstantPattern(Literal(locale)),
+                    LiteralExpression(SyntaxKind.TrueLiteralExpression)))
+                .Concat(new[] { SwitchExpressionArm(DiscardPattern(), LiteralExpression(SyntaxKind.FalseLiteralExpression)) });
+            var isSupported = SwitchExpression(Id("candidate")).WithArms(SeparatedList(arms));
             return ConstructorDeclaration(Escaped(className))
                 .AddModifiers(Token(SyntaxKind.PublicKeyword))
                 .AddParameterListParameters(Parameter(IdentifierToken("locale")).WithType(CsType("string")))
                 .WithBody(Block(
                     Var("candidate", normalized),
                     WhileStatement(BinaryExpression(SyntaxKind.GreaterThanExpression, Member(Id("candidate"), "Length"), Number(0)),
-                        Block(SwitchStatement(Id("candidate")).AddSections(sections),
+                        Block(IfStatement(isSupported,
+                                Block(Assign(Id("_locale"), Id("candidate")), ReturnStatement())),
                             Var("separator", Call(Member(Id("candidate"), "LastIndexOf"),
                                 LiteralExpression(SyntaxKind.CharacterLiteralExpression, Microsoft.CodeAnalysis.CSharp.SyntaxFactory.Literal('-')))),
                             IfStatement(BinaryExpression(SyntaxKind.LessThanExpression, Id("separator"), Number(0)), BreakStatement()),

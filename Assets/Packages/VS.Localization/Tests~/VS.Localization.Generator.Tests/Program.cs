@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using VS.Localization.Generator;
 
@@ -32,6 +33,17 @@ static class Program
         Check(emit.Success, string.Join("\n", emit.Diagnostics));
         var assembly = Assembly.Load(stream.ToArray());
         Check(!assembly.GetType("Strings").IsPublic && assembly.GetType("Strings").IsClass, "internal class");
+        var stringsType = assembly.GetType("Strings");
+        Check(stringsType.GetProperty("Locale") == null, "locale is not public API");
+        Check(stringsType.GetProperty("Locale", BindingFlags.NonPublic | BindingFlags.Instance).GetMethod.IsPrivate, "private locale getter");
+        var generated = driver.GetRunResult().Results.Single().GeneratedSources.Single().SyntaxTree.GetRoot();
+        Check(!generated.DescendantNodes().OfType<SwitchStatementSyntax>().Any(), "generated dispatch uses switch expressions");
+        Check(generated.DescendantNodes().OfType<SwitchExpressionSyntax>().Count() == 6, "constructor and translations use switch expressions");
+        foreach (var locale in new[] { null, "", "unknown", "en-US" })
+            Check((string)stringsType.GetProperty("StringName").GetValue(Activator.CreateInstance(stringsType, new object[] { locale })) == "English", "fallback: " + locale);
+        foreach (var locale in new[] { "ru-RU", " RU_ru ", "ru-Cyrl-RU" })
+            Check((string)stringsType.GetProperty("StringName").GetValue(Activator.CreateInstance(stringsType, locale)) == "Русский", "regional locale: " + locale);
+        Check((string)stringsType.GetMethod("Shadow").Invoke(Activator.CreateInstance(stringsType, "en"), new object[] { "A", "B", "C" }) == "A B C", "parameters cannot shadow locale selection");
         Check((string)assembly.GetType("Use").GetMethod("Run").Invoke(null, null) == "Русский|тест 5 тест|{hello}|", "runtime translations/named args/fallback");
         Check(assembly.GetType("Strings").GetMethod("StringName2").GetParameters()[0].ParameterType == typeof(int), "typed arg");
         Check(driver.GetRunResult().Results.Single().GeneratedSources.Single().HintName == "Strings.g.cs", "virtual hint name");
