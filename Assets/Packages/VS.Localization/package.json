@@ -1,0 +1,16 @@
+{
+  "name": "com.yapkolotilov.vs-localization",
+  "version": "1.0.0",
+  "displayName": "VS.Localization",
+  "description": "Roslyn source generator for strongly typed YAML localization.",
+  "unity": "2022.3",
+  "author": {
+    "name": "YapKolotilov"
+  },
+  "keywords": [
+    "localization",
+    "yaml",
+    "roslyn",
+    "source-generator"
+  ]
+}

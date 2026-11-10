@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../Packages/VS.Localization/Schema/strings.schema.json
+# Keys become PascalCase properties or methods. en is the fallback language.
+yes:
+  en: "yes"
+  ru: "да"
+no:
+  en: "no, {name}"
+  ru: "нет, {name  }"
+welcome:
+  en: "Welcome, {name}!"
+  ru: "Добро пожаловать, {name}!"
+items_count:
+  en: "{name}, you have {count:int} items."
+  ru: "{name}, у тебя {count:int} предметов."

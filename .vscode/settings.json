@@ -1,0 +1,5 @@
+{
+  "yaml.schemas": {
+    "./Assets/Packages/VS.Localization/Schema/strings.schema.json": ["/Assets/**/Strings.yaml", "/Assets/**/*.loc.yaml"]
+  }
+}

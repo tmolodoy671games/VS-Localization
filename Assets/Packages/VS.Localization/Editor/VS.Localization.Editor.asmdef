@@ -1,0 +1,8 @@
+{
+  "name": "VS.Localization.Editor",
+  "rootNamespace": "VS.Localization.Editor",
+  "includePlatforms": [
+    "Editor"
+  ],
+  "autoReferenced": true
+}

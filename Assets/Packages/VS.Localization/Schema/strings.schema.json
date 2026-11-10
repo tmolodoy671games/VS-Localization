@@ -1,0 +1,162 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "VS.Localization catalog",
+  "description": "Entry keys generate PascalCase C# properties or methods.",
+  "type": "object",
+  "minProperties": 1,
+  "propertyNames": {
+    "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+  },
+  "additionalProperties": {
+    "$ref": "#/definitions/translations"
+  },
+  "examples": [
+    {
+      "yes": {
+        "en": "yes",
+        "ru": "да"
+      }
+    },
+    {
+      "items_count": {
+        "en": "{name}, you have {count:int} items.",
+        "ru": "{count} предметов у {name}."
+      }
+    }
+  ],
+  "definitions": {
+    "text": {
+      "type": "string",
+      "description": "Translation. Use {name} for string arguments or {count:int} for typed arguments, {{ and }} for literal braces. Quote all values. Parameters must match across languages.",
+      "examples": [
+        "Hello!",
+        "Hello, {name}!"
+      ]
+    },
+    "translations": {
+      "type": "object",
+      "description": "Translations by locale. Use exactly two spaces for indentation. en is the fallback if present, otherwise the first locale is used.",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[a-zA-Z]{2,8}(-[a-zA-Z0-9]{1,8})*$"
+      },
+      "properties": {
+        "en": {
+          "type": "string",
+          "description": "English (fallback when present). Translation. Use {name} for string arguments or {count:int} for typed arguments, {{ and }} for literal braces. Quote all values. Parameters must match across languages.",
+          "examples": [
+            "Hello!",
+            "Hello, {name}!"
+          ]
+        },
+        "ru": {
+          "type": "string",
+          "description": "Russian. Translation. Use {name} for string arguments or {count:int} for typed arguments, {{ and }} for literal braces. Quote all values. Parameters must match across languages.",
+          "examples": [
+            "Hello!",
+            "Hello, {name}!"
+          ]
+        },
+        "de": {
+          "type": "string",
+          "description": "German. Translation. Use {name} for string arguments or {count:int} for typed arguments, {{ and }} for literal braces. Quote all values. Parameters must match across languages.",
+          "examples": [
+            "Hello!",
+            "Hello, {name}!"
+          ]
+        },
+        "fr": {
+          "type": "string",
+          "description": "French. Translation. Use {name} for string arguments or {count:int} for typed arguments, {{ and }} for literal braces. Quote all values. Parameters must match across languages.",
+          "examples": [
+            "Hello!",
+            "Hello, {name}!"
+          ]
+        },
+        "es": {
+          "type": "string",
+          "description": "Spanish. Translation. Use {name} for string arguments or {count:int} for typed arguments, {{ and }} for literal braces. Quote all values. Parameters must match across languages.",
+          "examples": [
+            "Hello!",
+            "Hello, {name}!"
+          ]
+        },
+        "it": {
+          "type": "string",
+          "description": "Italian. Translation. Use {name} for string arguments or {count:int} for typed arguments, {{ and }} for literal braces. Quote all values. Parameters must match across languages.",
+          "examples": [
+            "Hello!",
+            "Hello, {name}!"
+          ]
+        },
+        "pt-BR": {
+          "type": "string",
+          "description": "Portuguese (Brazil). Translation. Use {name} for string arguments or {count:int} for typed arguments, {{ and }} for literal braces. Quote all values. Parameters must match across languages.",
+          "examples": [
+            "Hello!",
+            "Hello, {name}!"
+          ]
+        },
+        "ja": {
+          "type": "string",
+          "description": "Japanese. Translation. Use {name} for string arguments or {count:int} for typed arguments, {{ and }} for literal braces. Quote all values. Parameters must match across languages.",
+          "examples": [
+            "Hello!",
+            "Hello, {name}!"
+          ]
+        },
+        "ko": {
+          "type": "string",
+          "description": "Korean. Translation. Use {name} for string arguments or {count:int} for typed arguments, {{ and }} for literal braces. Quote all values. Parameters must match across languages.",
+          "examples": [
+            "Hello!",
+            "Hello, {name}!"
+          ]
+        },
+        "zh-Hans": {
+          "type": "string",
+          "description": "Chinese (Simplified). Translation. Use {name} for string arguments or {count:int} for typed arguments, {{ and }} for literal braces. Quote all values. Parameters must match across languages.",
+          "examples": [
+            "Hello!",
+            "Hello, {name}!"
+          ]
+        },
+        "zh-Hant": {
+          "type": "string",
+          "description": "Chinese (Traditional). Translation. Use {name} for string arguments or {count:int} for typed arguments, {{ and }} for literal braces. Quote all values. Parameters must match across languages.",
+          "examples": [
+            "Hello!",
+            "Hello, {name}!"
+          ]
+        },
+        "tr": {
+          "type": "string",
+          "description": "Turkish. Translation. Use {name} for string arguments or {count:int} for typed arguments, {{ and }} for literal braces. Quote all values. Parameters must match across languages.",
+          "examples": [
+            "Hello!",
+            "Hello, {name}!"
+          ]
+        },
+        "pl": {
+          "type": "string",
+          "description": "Polish. Translation. Use {name} for string arguments or {count:int} for typed arguments, {{ and }} for literal braces. Quote all values. Parameters must match across languages.",
+          "examples": [
+            "Hello!",
+            "Hello, {name}!"
+          ]
+        },
+        "uk": {
+          "type": "string",
+          "description": "Ukrainian. Translation. Use {name} for string arguments or {count:int} for typed arguments, {{ and }} for literal braces. Quote all values. Parameters must match across languages.",
+          "examples": [
+            "Hello!",
+            "Hello, {name}!"
+          ]
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/definitions/text"
+      }
+    }
+  }
+}
